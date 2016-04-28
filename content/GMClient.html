@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+
+<html lang="en" ng-app="GMClientApp">
+
+	<head>
+		<script src="https://cdn.socket.io/socket.io-1.4.5.js">
+			socket.io 1.4.5
+		</script>
+		<script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.5.3/angular.min.js">
+			angularjs 1.5.3
+		</script>
+		<script src="/static/GMClient/index.js"></script>
+
+		<link rel="stylesheet" type="text/css" href="/static/GMClient/index.css">
+
+		<title>
+			Cookie tapper - game master panel
+		</title>
+	</head>
+
+	<body ng-controller="GMClientCtrl" ng-style="{'background': 'linear-gradient(0deg, #ddd ' + (data.odor * 100) + '%, white 0%)'}">
+		<div ng-show="!authorized">
+			<label>Password: <input ng-model="passwordTry" type="password"></label>
+			<input type="submit" value="Go" ng-click="tryAuth(passwordTry)" ng-disabled="waitingForAuth">
+		</div>
+
+		<div ng-show="authorized">
+			<div ng-show="phase === 0">
+				<input type="submit" value="Start game" ng-click="setPhase(1)">
+				<ul>
+					<li ng-repeat="player in playerList">{{player}}</li>
+				</ul>
+			</div>
+
+			<div ng-show="phase > 0">
+				<div>
+					Total cookies: {{data.counts.cookies}}<br>
+					Total arominators: {{data.counts.arominators}}<br>
+					Total cookie presses: {{data.counts.cookiePresses}}<br>
+					Total factories: {{data.counts.factories}}<br>
+					<ol>
+						<li ng-repeat="player in data.rankings">
+							{{player.nick}}: {{player.cookies}} cookies
+						</li>
+					</ol>
+				</div>
+
+				<div>
+					Current phase: {{phase}}<br>
+					<input type="submit" value="Next phase" ng-show="phase < 4" ng-click="setPhase(phase + 1)">
+				</div>
+
+				<div>
+					<input type="submit" ng-value="paused? 'Play' : 'Pause'" ng-click="togglePause()">
+				</div>
+			</div>
+		</div>
+	</body>
+
+</html>

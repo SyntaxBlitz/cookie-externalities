@@ -1,0 +1,163 @@
+body {
+	font-family: sans-serif;
+	background-color: #f3edfa;
+}
+
+.invisible {
+	visibility: hidden;
+}
+
+.disabled {
+	color: rgba(0, 0, 0, .3);
+}
+
+.name-entry {
+	padding-top: 20vh;
+}
+
+.name-entry label {
+	font-size: 14pt;
+	font-weight: bold;
+	display: block;
+	width: 100%;
+	text-align: center;
+}
+
+.name-entry input {
+	display: block;
+	font-size: 18pt;
+	margin-left: auto;
+	margin-right: auto;
+}
+
+.name-entry input[type=text] {
+	width: 70vw;
+	text-align: center;
+}
+
+.name-entry input[type=submit] {
+	width: 20vw;
+}
+
+.simulation-waiting {
+	font-size: 16pt;
+	text-align: center;
+	line-height: 2em;
+
+	padding-top: 20vh;
+}
+
+#totalCookies {
+	position: absolute;
+	top: 10px;
+	left: 10px;
+	font-size: 16px;
+	font-weight: bold;
+}
+
+#rank {
+	position: absolute;
+	top: 10px;
+	right: 10px;
+	font-weight: bold;
+}
+
+#centralCookie {
+	margin-top: 10vh;
+
+	width: 60vw;
+	height: 60vw;
+	margin-left: auto;
+	margin-right: auto;
+	background-image: url(/static/cookie-256.png);
+	background-size: contain;
+}
+
+#centralCookie.low {
+	margin-top: 30vh;
+}
+
+#centralCookie.magic {
+	background-image: url(/static/magic-cookie-256.png);
+}
+
+#centralCookie span {
+	font-size: 36px;
+	font-weight: bold;
+	color: white;
+	display: block;
+	padding-top: 10vh;
+	text-align: center;
+}
+
+#producersLabel {
+	margin-top: 10%;
+	font-weight: bold;
+	padding: 10px;
+	background-color: rgba(0, 0, 0, .1);
+	display: inline-block;
+}
+
+.producerRow {
+	width: calc(100vw - 20px);
+	margin-left: auto;
+	margin-right: auto;
+	margin-top: 4vh;
+	height: 8vh;
+	
+	background-size: contain;
+	background-repeat: no-repeat;
+}
+
+#arominatorsRow {
+	background-image: url(/static/arominator-64.png);
+}
+
+#cookiePressesRow {
+	background-image: url(/static/cookie-press-64.png);
+}
+
+#factoriesRow {
+	background-image: url(/static/factory-64.png);
+}
+
+.cookieAnimate {
+	position: absolute;
+	transition: transform 3s linear, opacity 3s ease-in;
+}
+
+#store {
+	margin-top: 10vh;
+	font-size: 20px;
+}
+
+.totalRow {
+	padding-left: 30px;
+	background-size: contain;
+	background-repeat: no-repeat;
+	margin-top: 10vh;
+}
+
+#totalArominators {
+	margin-top: 5vh;
+	background-image: url(/static/arominator-64.png);
+}
+
+#totalCookiePresses {
+	background-image: url(/static/cookie-press-64.png);
+}
+
+#totalFactories {
+	background-image: url(/static/factory-64.png);
+}
+
+.buy-button, .sell-button {
+	margin-left: 20vw;
+}
+
+#paused {
+	margin-top: 20vh;
+	font-size: 10vw;
+	font-weight: bold;
+	text-align: center;
+}
