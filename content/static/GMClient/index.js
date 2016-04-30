@@ -3,10 +3,16 @@ var GMClientApp = angular.module('GMClientApp', []);
 GMClientApp.controller('GMClientCtrl', function ($scope) {
 	window.MY_SCOPE = $scope;
 
+	$scope.showFinalResults = false;
+
 	var socket = io('http://micro.hights.town');
 	socket.on('initial', function (data) {
 		$scope.phase = data.phase;
-		$scope.paused = data.paused
+		$scope.paused = data.paused;
+		
+		if ($scope.phase === 5) {
+			$scope.showFinalResults = true;
+		}
 
 		$scope.$apply();
 	});
@@ -27,6 +33,12 @@ GMClientApp.controller('GMClientCtrl', function ($scope) {
 
 	socket.on('New phase', function (data) {
 		$scope.phase = data.phase;
+		if ($scope.phase === 5) {
+			$scope.showFinalResults = false;
+			window.setTimeout(function () {
+				$scope.showFinalResults = true;
+			}, 5000);
+		}
 
 		$scope.$apply();
 	});

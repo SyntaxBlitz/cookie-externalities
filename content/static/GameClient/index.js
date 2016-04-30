@@ -20,14 +20,14 @@ var context;
 var GameClientApp = angular.module('GameClientApp', []);
 var gUuid = globalUuid();
 var NETWORK_TICKRATE = 1000;
-var PRODUCER_TICKRATE = 100;
 
 var PHASES = {
 	'lobby': 0,
 	'tap_for_cookies': 1,
 	'purchase_producers': 2,
 	'odor_introduction': 3,
-	'government_intervention': 4
+	'government_intervention': 4,
+	'game_over': 5
 };
 
 var canvasDimensions = [0, 0];
@@ -38,6 +38,7 @@ var networkTick;
 
 GameClientApp.controller('GameClientCtrl', function ($scope) {
 	window.MY_SCOPE = $scope;
+	$scope.finalNetworkUpdate = false;
 
 	var socket = io('http://micro.hights.town');
 	socket.on('initial', function (data) {
@@ -159,14 +160,12 @@ GameClientApp.controller('GameClientCtrl', function ($scope) {
 		'factories': 18
 	};
 
-	var networkInterval;
-
 	var startTicking = function () {
 		ticking = true;
 	};
 
 	giveCookies = function (delta) {
-		if ($scope.paused)
+		if ($scope.paused || $scope.phase === PHASES.game_over)
 			return;
 
 		for (var i = 0; i < $scope.data.arominators; i++) {
@@ -212,8 +211,14 @@ GameClientApp.controller('GameClientCtrl', function ($scope) {
 	};
 
 	networkTick = function () {
-		if ($scope.phase !== 0) {
+		if ($scope.phase === PHASES.game_over && $scope.finalNetworkUpdate)
+			return;
+
+		if ($scope.phase !== PHASES.lobby) {
 			socket.emit('Data update', {'uuid': gUuid, 'data': $scope.data});	// not really meant to be secure :)
+			if ($scope.phase === PHASES.game_over) {
+				$scope.finalNetworkUpdate = true;
+			}
 		}
 	};
 

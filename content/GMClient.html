@@ -32,7 +32,7 @@
 				</ul>
 			</div>
 
-			<div ng-show="phase > 0">
+			<div ng-show="phase > 0 && phase !== 5">
 				<div>
 					Total cookies: {{data.counts.cookies}}<br>
 					Total arominators: {{data.counts.arominators}}<br>
@@ -47,11 +47,27 @@
 
 				<div>
 					Current phase: {{phase}}<br>
-					<input type="submit" value="Next phase" ng-show="phase < 4" ng-click="setPhase(phase + 1)">
+					<input type="submit" value="Next phase" ng-show="phase < 4" ng-click="setPhase(phase + 1)"><br>
+					<input type="submit" value="END GAME" ng-show="phase === 4" ng-click="setPhase(5)">
 				</div>
 
 				<div>
 					<input type="submit" ng-value="paused? 'Play' : 'Pause'" ng-click="togglePause()">
+				</div>
+			</div>
+
+			<div ng-show="phase === 5">
+				Game over!
+				<div ng-hide="showFinalResults">
+					Tabulating final scores...
+				</div>
+				<div ng-show="showFinalResults">
+					Final results:
+					<ol>
+						<li ng-repeat="player in data.rankings">
+							{{player.nick}}: {{player.cookies}} cookies
+						</li>
+					</ol>
 				</div>
 			</div>
 		</div>

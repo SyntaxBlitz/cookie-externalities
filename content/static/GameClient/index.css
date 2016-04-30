@@ -157,7 +157,7 @@ body {
 	margin-left: 20vw;
 }
 
-#paused {
+#paused, #gameOver {
 	margin-top: 20vh;
 	font-size: 10vw;
 	font-weight: bold;

@@ -28,7 +28,8 @@ var PHASES = {
 	'tap_for_cookies': 1,
 	'purchase_producers': 2,
 	'odor_introduction': 3,
-	'government_intervention': 4
+	'government_intervention': 4,
+	'game_over': 5
 };
 
 app.use('/static', express.static(sendFileOptions.root + '/static'));
@@ -200,7 +201,7 @@ var startTicking = function () {
 	}, NETWORK_TICKRATE);
 
 	setInterval(function () {
-		if (paused)
+		if (paused || phase === PHASES.game_over)
 			return;
 
 		if (phase >= PHASES.odor_introduction) {
@@ -216,6 +217,11 @@ var startTicking = function () {
 			odor -= odorPerFactoryPerSecond * arominators * (UPDATE_TICKRATE / 1000) * odorMultiplier;
 
 			odor = Math.max(0, Math.min(1, odor));
+
+			if (phase === PHASES.government_intervention && odor === 0) {
+				phase = PHASES.game_over;
+				io.emit('New phase', {'phase': phase});
+			}
 		}
 	}, UPDATE_TICKRATE);
 };
@@ -258,10 +264,15 @@ var getGMData = function () {
 		};
 	});
 
+	var sendOdor = odor;
+	if (phase === PHASES.game_over) {
+		sendOdor = 0;
+	}
+
 	return {
 		'counts': counts,
 		'rankings': rankings,
-		'odor': odor
+		'odor': sendOdor
 	};
 };
 

@@ -23,7 +23,7 @@
 
 	<body ng-controller="GameClientCtrl">
 		<div ng-show="inGame">
-			<div ng-hide="paused || gameOver">
+			<div ng-hide="paused || phase === 5">
 				<div ng-show="phase === 0 && nick === ''" class="name-entry">
 					<label>What's your name?<input ng-model="nickEntry" type="text" ng-minlength="3" ng-maxlength="24"></label><br>
 					<input type="submit" value="Go" ng-click="setNick(nickEntry)" ng-disabled="processingNick">
@@ -72,8 +72,8 @@
 				GAME PAUSED
 			</div>
 
-			<div ng-show="gameOver" id="gameOver">
-				Game over
+			<div ng-show="phase === 5" id="gameOver">
+				GAME OVER
 			</div>
 		</div>
 	</body>
