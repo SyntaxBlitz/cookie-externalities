@@ -19,7 +19,7 @@ var context;
 
 var GameClientApp = angular.module('GameClientApp', []);
 var gUuid = globalUuid();
-var NETWORK_TICKRATE = 100;
+var NETWORK_TICKRATE = 1000;
 var PRODUCER_TICKRATE = 100;
 
 var PHASES = {
@@ -31,6 +31,9 @@ var PHASES = {
 };
 
 var canvasDimensions = [0, 0];
+
+var ticking = false;
+var giveCookies;
 
 GameClientApp.controller('GameClientCtrl', function ($scope) {
 	window.MY_SCOPE = $scope;
@@ -156,44 +159,61 @@ GameClientApp.controller('GameClientCtrl', function ($scope) {
 	};
 
 	var networkInterval;
-	var producerInterval;
 
 	var startTicking = function () {
-		console.log('START TICKING');
-		networkInterval = window.setInterval(function () {
+		ticking = true;
+		networkInterval = setAnimationInterval(function () {
 			if ($scope.phase !== 0) {
 				socket.emit('Data update', {'uuid': gUuid, 'data': $scope.data});	// not really meant to be secure :)
 			}
 		}, NETWORK_TICKRATE);
-
-		producerInterval = window.setInterval(function () {
-			if ($scope.paused)
-				return;
-
-			for (var i = 0; i < $scope.data.arominators; i++) {
-				if (Math.random() < $scope.expectedValues().arominators / (1000 / PRODUCER_TICKRATE)) {
-					$scope.data.cookies++;
-					addCookie('arominators');
-				}
-			}
-
-			for (var i = 0; i < $scope.data.cookiePresses; i++) {
-				if (Math.random() < $scope.expectedValues().cookiePresses / (1000 / PRODUCER_TICKRATE)) {
-					$scope.data.cookies++;
-					addCookie('cookiePresses');
-				}
-			}
-
-			for (var i = 0; i < $scope.data.factories; i++) {
-				if (Math.random() < $scope.expectedValues().factories / (1000 / PRODUCER_TICKRATE)) {
-					$scope.data.cookies++;
-					addCookie('factories');
-				}
-			}
-
-			$scope.$apply();
-		}, PRODUCER_TICKRATE);
 	};
+
+	giveCookies = function (delta) {
+		if ($scope.paused)
+			return;
+
+		for (var i = 0; i < $scope.data.arominators; i++) {
+			var toGive = $scope.expectedValues().arominators / (1000 / delta);
+			while (cookiesToGive > 1) {
+				$scope.data.cookies++;
+				addCookie('arominators');
+				cookiesToGive--;
+			}
+			if (Math.random() < cookiesToGive) {
+				$scope.data.cookies++;
+				addCookie('arominators');
+			}
+		}
+
+		for (var i = 0; i < $scope.data.cookiePresses; i++) {
+			var cookiesToGive = $scope.expectedValues().cookiePresses / (1000 / delta);
+			while (cookiesToGive > 1) {
+				$scope.data.cookies++;
+				addCookie('cookiePresses');
+				cookiesToGive--;
+			}
+			if (Math.random() < cookiesToGive) {
+				$scope.data.cookies++;
+				addCookie('cookiePresses');
+			}
+		}
+
+		for (var i = 0; i < $scope.data.factories; i++) {
+			var cookiesToGive = $scope.expectedValues().factories / (1000 / delta);
+			while (cookiesToGive > 1) {
+				$scope.data.cookies++;
+				addCookie('factories');
+				cookiesToGive--;
+			}
+			if (Math.random() < cookiesToGive) {
+				$scope.data.cookies++;
+				addCookie('factories');
+			}
+		}
+
+		$scope.$apply();
+	}
 
 	// cache these values for use when the store is up
 	var cookieTops = {'arominators': 0, 'cookiePresses': 0, 'factories': 0};
@@ -234,8 +254,9 @@ GameClientApp.controller('GameClientCtrl', function ($scope) {
 	};
 
 	var stopTicking = function () {
+		ticking = false;
 		window.clearInterval(networkInterval);
-		window.clearInterval(producerInterval);
+		//window.clearInterval(producerInterval);
 	};
 
 	$scope.earningPotential = function () {
@@ -260,15 +281,15 @@ GameClientApp.controller('GameClientCtrl', function ($scope) {
 		return Math.floor($scope.priceMatrix[type] * $scope.earningPotential() * multiplier);
 	};
 
-	window.setInterval(function () {
-		if ($scope.magicCookieClicks === 0 && !scope.showStore && $scope.phase > 0) {
-			location.reload();
-		}
-	}, 30 * 1000);
-
 });
 
 var toAdd = {'arominators': false, 'cookiePresses': false, 'factories': false};
+
+var animationIntervals = [];
+
+setAnimationInterval = function (func, ms) {
+	animationIntervals.push([func, ms, 0]);
+};
 
 window.onload = function () {
 	context = document.getElementById('cookiesCanvas').getContext('2d');
@@ -298,6 +319,18 @@ window.onload = function () {
 		context.fillRect(0, 0, movePx, context.canvas.height);
 
 		drawCookies(cookieImg);
+
+		for (var i = 0; i < animationIntervals.length; i++) {
+			var timeSince = +new Date() - animationIntervals[i][2];
+			if (timeSince > animationIntervals[i][1]) {
+				animationIntervals[i][0](timeSince);
+				animationIntervals[i][2] = +new Date();
+			}
+		}
+
+		if (ticking) {
+			giveCookies(delta);
+		}
 
 		window.requestAnimationFrame(render);
 	};
