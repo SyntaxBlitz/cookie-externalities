@@ -155,8 +155,8 @@ GameClientApp.controller('GameClientCtrl', function ($scope) {
 
 	$scope.priceMatrix = {
 		'arominators': 10,
-		'cookiePresses': 15,
-		'factories': 25
+		'cookiePresses': 12,
+		'factories': 18
 	};
 
 	var networkInterval;
