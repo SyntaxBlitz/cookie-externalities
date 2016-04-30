@@ -265,7 +265,7 @@ var getGMData = function () {
 	});
 
 	var sendOdor = odor;
-	if (phase === PHASES.game_over) {
+	if (phase < PHASES.odor_introduction || phase > PHASES.government_intervention) {
 		sendOdor = 0;
 	}
 
