@@ -41,9 +41,10 @@
 						<div id="centralCookie" ng-click="clickCookie()" ng-class="(magicCookieClicks > 0? 'magic ' : '') + (phase === 1? 'low' : '')" ng-hide="showStore"><span ng-show="magicCookieClicks > 0">{{magicCookieClicks * 10}}</span></div>
 					</div>
 
-					<div ng-show="phase > 1" ng-hide="showStore">
+					<div ng-show="phase > 1 && !showStore">
 						<div id="producersLabel" ng-click="showStore = true">Buy/Sell Producers</div>
 
+						<canvas id="cookiesCanvas"></canvas>
 						<div class="producerRow" id="arominatorsRow"></div>
 						<div class="producerRow" id="cookiePressesRow"></div>
 						<div class="producerRow" id="factoriesRow"></div>
@@ -52,20 +53,18 @@
 					<div ng-show="showStore" id="store">
 						<div ng-click="showStore = false">back</div>
 
-						<div id="totalArominators" class="totalRow">{{data.arominators}} arominator{{data.arominators === 1? '' : 's'}} ({{expectedValues().arominators}} cookie/sec)</div>
+						<div id="totalArominators" class="totalRow">{{data.arominators}} arominator{{data.arominators === 1? '' : 's'}} ({{expectedValues().arominators}} cookie{{expectedValues().arominators === 1? '' : 's'}}/sec)</div>
 						<div ng-click="buy('arominators')" ng-class="data.cookies >= price('arominators')? 'buy-button' : 'buy-button disabled'">buy (-{{price('arominators', 'buy')}} cookies)</div>
 						<div ng-click="sell('arominators')" ng-class="data.arominators > 0? 'sell-button' : 'sell-button invisible'">sell (+{{price('arominators', 'sell')}} cookies)</div>
 
-						<div id="totalCookiePresses" class="totalRow">{{data.cookiePresses}} cookie press{{data.cookiePresses === 1? '' : 'es'}} ({{expectedValues().cookiePresses}} cookie/sec)</div>
+						<div id="totalCookiePresses" class="totalRow">{{data.cookiePresses}} cookie press{{data.cookiePresses === 1? '' : 'es'}} ({{expectedValues().cookiePresses}} cookie{{expectedValues().cookiePresses === 1? '' : 's'}}/sec)</div>
 						<div ng-click="buy('cookiePresses')" ng-class="data.cookies >= price('cookiePresses')? 'buy-button' : 'buy-button disabled'">buy (-{{price('cookiePresses', 'buy')}} cookies)</div>
 						<div ng-click="sell('cookiePresses')" ng-class="data.cookiePresses > 0? 'sell-button' : 'sell-button invisible'">sell (+{{price('cookiePresses', 'sell')}} cookies)</div>
 
-						<div id="totalFactories" class="totalRow">{{data.factories}} factor{{data.factories === 1? 'y' : 'ies'}} ({{expectedValues().factories}} cookie/sec)</div>
+						<div id="totalFactories" class="totalRow">{{data.factories}} factor{{data.factories === 1? 'y' : 'ies'}} ({{expectedValues().factories}} cookie{{expectedValues().factories === 1? '' : 's'}}/sec)</div>
 						<div ng-click="buy('factories')" ng-class="data.cookies >= price('factories')? 'buy-button' : 'buy-button disabled'">buy (-{{price('factories', 'buy')}} cookies)</div>
 						<div ng-click="sell('factories')" ng-class="data.factories > 0? 'sell-button' : 'sell-button invisible'">sell (+{{price('factories', 'sell')}} cookies)</div>
 					</div>
-
-					<div id="floatingCookies" ng-class="showStore? 'invisible': ''"></div>
 				</div>
 			</div>
 

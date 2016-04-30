@@ -91,9 +91,11 @@ body {
 }
 
 #producersLabel {
-	margin-top: 10%;
+	margin-top: 5vh;
 	font-weight: bold;
-	padding: 10px;
+	font-size: 3vh;
+	height: 3vh;
+	padding: 2vh;
 	background-color: rgba(0, 0, 0, .1);
 	display: inline-block;
 }
@@ -160,4 +162,8 @@ body {
 	font-size: 10vw;
 	font-weight: bold;
 	text-align: center;
+}
+
+#cookiesCanvas {
+	position: absolute;
 }

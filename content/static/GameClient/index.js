@@ -15,10 +15,12 @@ preload1.src = '/static/cookie-256.png';
 var preload2 = new Image();
 preload2.src = '/static/magic-cookie-256.png';
 
+var context;
+
 var GameClientApp = angular.module('GameClientApp', []);
 var gUuid = globalUuid();
-var NETWORK_TICKRATE = 500;
-var PRODUCER_TICKRATE = 250;
+var NETWORK_TICKRATE = 100;
+var PRODUCER_TICKRATE = 100;
 
 var PHASES = {
 	'lobby': 0,
@@ -28,11 +30,15 @@ var PHASES = {
 	'government_intervention': 4
 };
 
+var canvasDimensions = [0, 0];
+
 GameClientApp.controller('GameClientCtrl', function ($scope) {
 	window.MY_SCOPE = $scope;
 
 	var socket = io('http://micro.hights.town');
 	socket.on('initial', function (data) {
+		setCanvasDimensions();
+
 		$scope.phase = data.phase;
 		$scope.processingNick = false;
 		$scope.inGame = false;
@@ -167,21 +173,21 @@ GameClientApp.controller('GameClientCtrl', function ($scope) {
 			for (var i = 0; i < $scope.data.arominators; i++) {
 				if (Math.random() < $scope.expectedValues().arominators / (1000 / PRODUCER_TICKRATE)) {
 					$scope.data.cookies++;
-					//addCookieAnimation('arominators');
+					addCookie('arominators');
 				}
 			}
 
 			for (var i = 0; i < $scope.data.cookiePresses; i++) {
 				if (Math.random() < $scope.expectedValues().cookiePresses / (1000 / PRODUCER_TICKRATE)) {
 					$scope.data.cookies++;
-					//addCookieAnimation('cookiePresses');
+					addCookie('cookiePresses');
 				}
 			}
 
 			for (var i = 0; i < $scope.data.factories; i++) {
 				if (Math.random() < $scope.expectedValues().factories / (1000 / PRODUCER_TICKRATE)) {
 					$scope.data.cookies++;
-					//addCookieAnimation('factories');
+					addCookie('factories');
 				}
 			}
 
@@ -261,3 +267,85 @@ GameClientApp.controller('GameClientCtrl', function ($scope) {
 	}, 30 * 1000);
 
 });
+
+var toAdd = {'arominators': false, 'cookiePresses': false, 'factories': false};
+
+window.onload = function () {
+	context = document.getElementById('cookiesCanvas').getContext('2d');
+
+	var cookieImg = new Image();
+	cookieImg.src = '/static/cookie-256.png';
+
+	var lastFrame = +new Date();
+	var gradient = context.createLinearGradient(0, 0, context.canvas.width, context.canvas.height);
+	gradient.addColorStop(0, 'rgba(243, 237, 250, 0)');
+	gradient.addColorStop(.2, 'rgba(243, 237, 250, 0)');
+	gradient.addColorStop(.8, 'rgba(243, 237, 250, .1)');
+	gradient.addColorStop(1, 'rgba(243, 237, 250, 1)');
+	var render = function () {
+		var currentFrame = +new Date();
+		var delta = currentFrame - lastFrame;
+		lastFrame = currentFrame;
+
+		context.fillStyle = gradient;
+		context.fillRect(0, 0, context.canvas.width, context.canvas.height);
+
+		var movePx = 3 * (delta / 16);
+
+		var imageData = context.getImageData(0, 0, context.canvas.width - movePx, context.canvas.height);
+		context.putImageData(imageData, movePx, 0);
+		context.fillStyle = 'rgb(243,237,250)';
+		context.fillRect(0, 0, movePx, context.canvas.height);
+
+		drawCookies(cookieImg);
+
+		window.requestAnimationFrame(render);
+	};
+
+	window.requestAnimationFrame(render);
+
+};
+
+var drawCookies = function (cookieImg) {
+	if (toAdd.arominators) {
+		context.drawImage(cookieImg, 0, window.innerHeight * .08 / 2, 16, 16);
+		toAdd.arominators = false;
+	}
+	if (toAdd.cookiePresses) {
+		context.drawImage(cookieImg, 0, window.innerHeight * .12 + window.innerHeight * .08 / 2, 16, 16);
+		toAdd.cookiePresses = false;
+	}
+	if (toAdd.factories) {
+		context.drawImage(cookieImg, 0, window.innerHeight * .24 + window.innerHeight * .08 / 2, 16, 16);
+		toAdd.factories = false;
+	}
+};
+
+var addCookie = function (which) {
+	toAdd[which] = true;
+};
+
+window.onresize = function () {
+	setCanvasDimensions();
+};
+
+var setCanvasDimensions = function () {
+	console.log('hello');
+	var cookieMargin = 15;
+
+	var rowWidth = window.innerWidth - 10 * 2;
+	var rowHeight = window.innerHeight * .08;
+
+	canvasDimensions = [
+		rowWidth - rowHeight - cookieMargin,
+		rowHeight * 3 + rowHeight * .5 * 2
+	];
+
+	var canvas = document.getElementById('cookiesCanvas');
+	canvas.width = canvasDimensions[0];
+	canvas.height = canvasDimensions[1];
+
+	// save me jesus
+	canvas.style.top = (window.innerHeight * .1 + window.innerWidth * .6 + window.innerHeight * .05 + window.innerHeight * .07 + window.innerHeight * .04) + 'px';
+	canvas.style.right = '10px';
+};
