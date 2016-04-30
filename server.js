@@ -161,7 +161,8 @@ var syncPlayer = function (socket, uuid) {
 	});
 
 	socket.on('Data update', function (data) {
-		players[data.uuid].data = data.data;
+		if (players[data.uuid])
+			players[data.uuid].data = data.data;
 	});
 
 	socket.on('Magic cookie click', function () {
