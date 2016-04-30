@@ -34,6 +34,7 @@ var canvasDimensions = [0, 0];
 
 var ticking = false;
 var giveCookies;
+var networkTick;
 
 GameClientApp.controller('GameClientCtrl', function ($scope) {
 	window.MY_SCOPE = $scope;
@@ -162,11 +163,6 @@ GameClientApp.controller('GameClientCtrl', function ($scope) {
 
 	var startTicking = function () {
 		ticking = true;
-		networkInterval = setAnimationInterval(function () {
-			if ($scope.phase !== 0) {
-				socket.emit('Data update', {'uuid': gUuid, 'data': $scope.data});	// not really meant to be secure :)
-			}
-		}, NETWORK_TICKRATE);
 	};
 
 	giveCookies = function (delta) {
@@ -174,7 +170,7 @@ GameClientApp.controller('GameClientCtrl', function ($scope) {
 			return;
 
 		for (var i = 0; i < $scope.data.arominators; i++) {
-			var toGive = $scope.expectedValues().arominators / (1000 / delta);
+			var cookiesToGive = $scope.expectedValues().arominators / (1000 / delta);
 			while (cookiesToGive > 1) {
 				$scope.data.cookies++;
 				addCookie('arominators');
@@ -213,50 +209,20 @@ GameClientApp.controller('GameClientCtrl', function ($scope) {
 		}
 
 		$scope.$apply();
-	}
+	};
+
+	networkTick = function () {
+		if ($scope.phase !== 0) {
+			socket.emit('Data update', {'uuid': gUuid, 'data': $scope.data});	// not really meant to be secure :)
+		}
+	};
 
 	// cache these values for use when the store is up
 	var cookieTops = {'arominators': 0, 'cookiePresses': 0, 'factories': 0};
 	var cookieLeft;
 
-	addCookieAnimation = function (type) {
-		var cookieHeight = 16;
-
-		if (!$scope.showStore) {
-			var rowElement = document.getElementById(type + 'Row');
-			var top = rowElement.offsetTop;
-			var height = rowElement.offsetHeight;
-
-			var cookieMargin = 15;
-			cookieTops[type] = top + height / 2 - cookieHeight / 2;
-
-			// use offsetHeight because it gives the square width/height of the image, except in extreme cases
-			cookieLeft = rowElement.offsetLeft + rowElement.offsetHeight + cookieMargin;
-		}
-
-		var img = document.createElement('img');
-		img.src = '/static/cookie-256.png';
-		img.width = img.height = cookieHeight;
-
-		img.style.top = cookieTops[type] + 'px';
-		img.style.left = cookieLeft + 'px';
-
-		document.getElementById('floatingCookies').appendChild(img);
-		img.className = 'cookieAnimate';
-		window.setTimeout(function () {
-			img.style.transform = 'translateX(70vw)';
-			img.style.opacity = '0';			
-		}, 10);	// this delay fixes a weird thing where the animation just doesn't happen in chrome..
-
-		window.setTimeout(function () {
-			img.parentNode.removeChild(img);
-		}, 3100);
-	};
-
 	var stopTicking = function () {
 		ticking = false;
-		window.clearInterval(networkInterval);
-		//window.clearInterval(producerInterval);
 	};
 
 	$scope.earningPotential = function () {
@@ -285,12 +251,6 @@ GameClientApp.controller('GameClientCtrl', function ($scope) {
 
 var toAdd = {'arominators': false, 'cookiePresses': false, 'factories': false};
 
-var animationIntervals = [];
-
-setAnimationInterval = function (func, ms) {
-	animationIntervals.push([func, ms, 0]);
-};
-
 window.onload = function () {
 	context = document.getElementById('cookiesCanvas').getContext('2d');
 
@@ -303,6 +263,7 @@ window.onload = function () {
 	gradient.addColorStop(.2, 'rgba(243, 237, 250, 0)');
 	gradient.addColorStop(.8, 'rgba(243, 237, 250, .1)');
 	gradient.addColorStop(1, 'rgba(243, 237, 250, 1)');
+	var lastNetworkUpdate = +new Date();
 	var render = function () {
 		var currentFrame = +new Date();
 		var delta = currentFrame - lastFrame;
@@ -320,16 +281,16 @@ window.onload = function () {
 
 		drawCookies(cookieImg);
 
-		for (var i = 0; i < animationIntervals.length; i++) {
-			var timeSince = +new Date() - animationIntervals[i][2];
-			if (timeSince > animationIntervals[i][1]) {
-				animationIntervals[i][0](timeSince);
-				animationIntervals[i][2] = +new Date();
-			}
-		}
-
 		if (ticking) {
+			// Give cookies from producers
 			giveCookies(delta);
+
+			// Update the server every NETWORK_TICKRATE milliseconds
+			if (currentFrame - lastNetworkUpdate > NETWORK_TICKRATE) {
+				networkTick();
+
+				lastNetworkUpdate = currentFrame;
+			}
 		}
 
 		window.requestAnimationFrame(render);
