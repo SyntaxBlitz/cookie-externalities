@@ -324,7 +324,6 @@ window.onresize = function () {
 };
 
 var setCanvasDimensions = function () {
-	console.log('hello');
 	var cookieMargin = 15;
 
 	var rowWidth = window.innerWidth - 10 * 2;
