@@ -3,6 +3,7 @@
 <html lang="en" ng-app="GameClientApp">
 
 	<head>
+		<script src="/static/js.cookie.js"></script>
 		<script src="https://cdn.socket.io/socket.io-1.4.5.js">
 			socket.io 1.4.5
 		</script>
@@ -45,9 +46,11 @@
 						<div id="producersLabel" ng-click="showStore = true">Buy/Sell Producers</div>
 
 						<canvas id="cookiesCanvas"></canvas>
-						<div class="producerRow" id="arominatorsRow"></div>
-						<div class="producerRow" id="cookiePressesRow"></div>
-						<div class="producerRow" id="factoriesRow"></div>
+						<div ng-show="data.arominators + data.cookiePresses + data.factories > 0">
+							<div class="producerRow" id="arominatorsRow"></div>
+							<div class="producerRow" id="cookiePressesRow"></div>
+							<div class="producerRow" id="factoriesRow"></div>
+						</div>
 					</div>
 
 					<div ng-show="showStore" id="store">

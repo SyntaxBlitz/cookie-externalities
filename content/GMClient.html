@@ -26,46 +26,66 @@
 
 		<div ng-show="authorized">
 			<div ng-show="phase === 0">
-				<input type="submit" value="Start game" ng-click="setPhase(1)">
-				<ul>
+				<div id="instructions">
+					Go to http://micro.hights.town/ on your phone.
+				</div>
+				<ul id="playerList">
 					<li ng-repeat="player in playerList">{{player}}</li>
-				</ul>
+				</ul><br>
+				<input type="submit" value="Start game" ng-click="setPhase(1)" id="startButton">
 			</div>
 
 			<div ng-show="phase > 0 && phase !== 5">
 				<div>
-					Total cookies: {{data.counts.cookies}}<br>
-					Total arominators: {{data.counts.arominators}}<br>
-					Total cookie presses: {{data.counts.cookiePresses}}<br>
-					Total factories: {{data.counts.factories}}<br>
-					<ol>
+					<div id="totalArominators" class="totalRow" ng-show="phase > 1">
+						<img src="/static/arominator-64.png"><span> &times; {{data.counts.arominators}}</span>
+					</div>
+					<div id="totalCookiePresses" class="totalRow" ng-show="phase > 1">
+						<img src="/static/cookie-press-64.png"><span> &times; {{data.counts.cookiePresses}}</span>
+					</div>
+					<div id="totalFactories" class="totalRow" ng-show="phase > 1">
+						<img src="/static/factory-64.png"><span> &times; {{data.counts.factories}}</span>
+					</div>
+
+					<div id="totalCookies">
+						<img src="/static/cookie-256.png"><span> &times; {{data.counts.cookies}}</span>
+					</div>
+
+					<ol class="rankings" id="inGameRankings">
 						<li ng-repeat="player in data.rankings">
-							{{player.nick}}: {{player.cookies}} cookies
+							<span>{{player.nick}}: <img src="/static/cookie-256.png"> &times; {{player.cookies}}</span>
 						</li>
 					</ol>
 				</div>
 
-				<div>
+				<div id="controlPanel">
 					Current phase: {{phase}}<br>
 					<input type="submit" value="Next phase" ng-show="phase < 4" ng-click="setPhase(phase + 1)"><br>
-					<input type="submit" value="END GAME" ng-show="phase === 4" ng-click="setPhase(5)">
+					<input type="submit" ng-value="paused? 'Play' : 'Pause'" ng-click="togglePause()"><br>
+					<input type="submit" ng-show="phase > 0" value="Create magic cookie" ng-click="createMagicCookie()"><br>
+					<input type="submit" ng-value="'Change odor multiplier (now ' + odorMultiplier + ')'" ng-show="phase > 2" ng-click="promptOdorMultiplier()"><br>
+					<input type="submit" ng-value="'Change arominator multiplier (now ' + arominatorMultiplier + ')'" ng-show="phase > 2" ng-click="promptArominatorMultiplier()">
 				</div>
 
-				<div>
-					<input type="submit" ng-value="paused? 'Play' : 'Pause'" ng-click="togglePause()">
+				<div id="controlPanel2">
+					<input type="submit" value="END GAME" ng-show="phase === 4" ng-click="setPhase(5)">
 				</div>
 			</div>
 
-			<div ng-show="phase === 5">
-				Game over!
+			<div id="odorPanic" ng-show="phase > 2 && phase < 5" ng-style="{'top': 100 - data.odor * 100 + 1 + 'vh'}">
+				{{data.odor * 100 | number: 2}}%
+			</div>
+
+			<div ng-show="phase === 5" id="finalResults">
+				<a href="https://docs.google.com/presentation/d/1-NFZnTs_QWq2OmLJ2AsuLjO3pt7GkKLpVfu1YuqO21Y/edit?usp=sharing" style="color: black;">Game over!</a>
 				<div ng-hide="showFinalResults">
 					Tabulating final scores...
 				</div>
 				<div ng-show="showFinalResults">
 					Final results:
-					<ol>
+					<ol class="rankings">
 						<li ng-repeat="player in data.rankings">
-							{{player.nick}}: {{player.cookies}} cookies
+							<span>{{player.nick}}: <img src="/static/cookie-256.png"> &times; {{player.cookies}}</span>
 						</li>
 					</ol>
 				</div>

@@ -4,6 +4,129 @@ html {
 
 body {
 	font-family: sans-serif;
-	height: 100%;
 	background: white;
+}
+
+#instructions {
+	width: 100%;
+	text-align: center;
+	font-size: 48px;
+	margin-top: 10vh;
+}
+
+#playerList {
+	width: 80%;
+	margin-left: auto;
+	margin-right: auto;
+}
+
+#playerList li {
+	text-align: center;
+	float: left;
+	display: inline;
+	width: 33.333%;
+	font-size: 24px;
+	margin-bottom: 24px;
+}
+
+#startButton {
+	position: absolute;
+	bottom: 0;
+	right: 0;
+}
+
+.totalRow {
+	width: 30vw;
+	position: absolute;
+	top: 1vh;
+	font-size: 30px;
+}
+
+.totalRow img {
+	width: 48px;
+	height: 48px;
+}
+
+.totalRow span, .totalRow img {
+	vertical-align: middle;
+}
+
+#totalArominators {
+	text-align: left;
+	left: 1vw;
+}
+
+#totalCookiePresses {
+	text-align: center;
+	left: 35vw;
+}
+
+#totalFactories {
+	text-align: right;
+	right: 1vw;
+}
+
+#controlPanel {
+	position: absolute;
+	bottom: 0;
+	left: 0;
+}
+
+#controlPanel2 {
+	position: absolute;
+	bottom: 0;
+	right: 0;
+}
+
+#totalCookies {
+	position: absolute;
+	top: 10vh;
+	left: 10vw;
+	width: 80vw;
+	height: 256px;
+	text-align: center;
+	font-size: 100pt;
+}
+
+#totalCookies span, #totalCookies img {
+	vertical-align: middle;
+}
+
+.rankings#inGameRankings {
+	position: absolute;
+	top: calc(10vh + 256px + 2vh);
+	left: 50vw;
+	transform: translateX(-50%);
+
+	font-size: 36px;
+}
+
+.rankings li {
+	margin-bottom: 20px;
+}
+
+.rankings li span {
+	vertical-align: middle;
+}
+
+.rankings img {
+	width: 48px;
+	height: 48px;
+	vertical-align: middle;
+}
+
+#odorPanic {
+	position: absolute;
+	left: 1vh;
+	font-size: 24px;
+	font-weight: bold;
+}
+
+#finalResults {
+	font-size: 36px;
+	text-align: center;
+	transform: translateX(-50%);
+	position: absolute;
+	top: 20vh;
+	left: 50vw;
 }

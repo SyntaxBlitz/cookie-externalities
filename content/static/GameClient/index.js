@@ -1,11 +1,9 @@
 var globalUuid = function () {
-	if (localStorage && localStorage.getItem('uuid')) {
-		return localStorage.getItem('uuid');
-	} else {
-		var gUuid = uuid.v4();
-		if (localStorage) {
-			localStorage.setItem('uuid', gUuid);
-		}
+	if(Cookies.get('uuid')!==undefined) {
+		return Cookies.get('uuid');
+	} else  {
+		var gUuid=uuid.v4();
+		Cookies.set('uuid', gUuid, {'expires': 7});
 		return gUuid;
 	}
 };

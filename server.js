@@ -11,7 +11,7 @@ var sendFileOptions = {
 var phase = 0;
 var gmClientSocket = null;
 var players = {};
-var NETWORK_TICKRATE = 100;
+var NETWORK_TICKRATE = 500;
 var UPDATE_TICKRATE = 100;
 var paused = false;
 
@@ -19,9 +19,10 @@ var magicCookieClicks = 0;
 var sentMagicCookieZero = true;
 
 var odor = 0;
-var odorMultiplier = .2; // each arominator decreases the odor level by odorMultiplier * amount by which factories increase level.
-                         // this lets us rig the simulation so it does what we want. set this to a lower number to make arominators less useful for society.
-                         // set it to a high number to lower the odor level quicker.
+var odorMultiplier = 1;
+var factoriesPerArominator = 0.2; // each arominator decreases the odor level by odorMultiplier * amount by which factories increase level.
+                        		 // this lets us rig the simulation so it does what we want. set this to a lower number to make arominators less useful for society.
+                        		 // set it to a high number to lower the odor level quicker.
 
 var PHASES = {
 	'lobby': 0,
@@ -85,7 +86,10 @@ var checkNick = function (nick) {
 var setupGMSocket = function (socket) {
 	gmClientSocket = socket;
 
-	socket.emit('Authorized');
+	socket.emit('Authorized', {
+		'odorMultiplier': odorMultiplier,
+		'arominatorMultiplier': factoriesPerArominator
+	});
 
 	if (Object.keys(players).length > 0) {
 		socket.emit('Player list update', {'list': playerNames()});
@@ -116,6 +120,16 @@ var setupGMSocket = function (socket) {
 	socket.on('Create magic cookie', function (data) {
 		magicCookieClicks = data.clicks;
 		sentMagicCookieZero = false;
+	});
+
+	socket.on('Change odor multiplier', function (data) {
+		odorMultiplier = data.multiplier;
+		socket.emit('Change odor multiplier', data);
+	});
+
+	socket.on('Change arominator multiplier', function (data) {
+		factoriesPerArominator = data.multiplier;
+		socket.emit('Change arominator multiplier', data);
 	});
 };
 
@@ -213,8 +227,9 @@ var startTicking = function () {
 			var factories = counts.factories;
 			var arominators = counts.arominators;
 
-			odor += odorPerFactoryPerSecond * factories * (UPDATE_TICKRATE / 1000);
-			odor -= odorPerFactoryPerSecond * arominators * (UPDATE_TICKRATE / 1000) * odorMultiplier;
+			// units should work out :)
+			odor += odorPerFactoryPerSecond * factories * (UPDATE_TICKRATE / 1000) * odorMultiplier;
+			odor -= odorPerFactoryPerSecond * arominators * (UPDATE_TICKRATE / 1000) * factoriesPerArominator * odorMultiplier;
 
 			odor = Math.max(0, Math.min(1, odor));
 
